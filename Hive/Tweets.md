@@ -26,8 +26,6 @@ LOAD DATA INPATH '/user/hive/data/sample_twitter_data.txt' OVERWRITE INTO TABLE 
 ## All the tweets by the twitter user "Aimee_Cottle"
 
 ```
-SELECT * FROM tweets WHERE user.screenname='Aimee_Cottle';
-
 SELECT 
     tweetmessage 
 FROM 
