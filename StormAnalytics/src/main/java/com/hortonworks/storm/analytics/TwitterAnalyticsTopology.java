@@ -47,9 +47,9 @@ public class TwitterAnalyticsTopology {
         topology.setBolt("HdfsBolt", bolt, 2).shuffleGrouping(spout);
     }
 
-    public void configureKafkaSpout(TopologyBuilder topology){
-        BrokerHosts brokerHosts = new ZkHosts("10.10.11.99:2181,10.10.11.102:2181,10.10.11.103:2181");
-        SpoutConfig kafkaConfig = new SpoutConfig(brokerHosts, "tweets", "", "TwitterAnalyticsTopology");
+    public void configureKafkaSpout(TopologyBuilder topology,Properties properties){
+        BrokerHosts brokerHosts = new ZkHosts(properties.getProperty("kafkaZkHosts"));
+        SpoutConfig kafkaConfig = new SpoutConfig(brokerHosts, properties.getProperty("kafkaTopic"), "", "TwitterAnalyticsTopology");
         kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         
         // Instantiate Kafka Spout
@@ -63,7 +63,7 @@ public class TwitterAnalyticsTopology {
         conf.setNumWorkers(Integer.parseInt(properties.getProperty("NumWorkers")));
         conf.setMaxSpoutPending(Integer.parseInt(properties.getProperty("MaxSpoutPending")));
 
-        configureKafkaSpout(topology);
+        configureKafkaSpout(topology, properties);
         configureKafkaHdfsBolt(topology,"KafkaSpout", properties.getProperty("hdfsUri"));
         topology.setBolt("TweetCountBolt", new TweetCountBolt(), 1).shuffleGrouping("KafkaSpout");
         topology.setBolt("TweetGroupedByLanguageBolt", new TweetGroupedByLanguageBolt(), 1).shuffleGrouping("KafkaSpout");
